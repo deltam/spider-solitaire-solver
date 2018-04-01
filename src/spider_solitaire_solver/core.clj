@@ -146,6 +146,11 @@
         (assoc-in [:stacks from] new-from-stk)
         (assoc-in [:stacks to] new-to-stk))))
 
+(defn drawable?
+  "札を山札に配布することは可能か？"
+  [{stk :stacks}]
+  (every? #(not (empty? %)) stk))
+
 (defn move-draw
   "山札から10枚引く"
   [deck]
@@ -183,9 +188,12 @@
   [draw? from to n]
   (let [deck (current-deck)]
     (if draw?
-      (push-history (remove-sorted-card (move-draw deck)))
+      (if (drawable? deck)
+        (push-history (remove-sorted-card (move-draw deck)))
+        (println "!!! 空の山があると札を配布できません !!!"))
       (if (movable? deck from to n)
-        (push-history (remove-sorted-card (move-card deck from to n)))))))
+        (push-history (remove-sorted-card (move-card deck from to n)))
+        (printf "!!! %d枚を%d列から%d列に移動することは出来ません !!!\n" n from to)))))
 
 (defn move-undo
   "一手戻す"
