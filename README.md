@@ -1,4 +1,4 @@
-# spider-soltaire-solver
+# spider-solitaire-solver
 
 Spider Solitaire Game & Solver written by Clojure.
 
