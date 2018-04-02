@@ -65,6 +65,10 @@ draw:  50
 nil
 ```
 
+### Solve
+
+Under construction.
+
 ## License
 
 Copyright (c) 2018 Masaru MISUMI(deltam@gmail.com).
