@@ -73,7 +73,8 @@
   [stk]
   (if (not-empty stk)
     (let [last-idx (dec (count stk))]
-      (update stk last-idx open-card))))
+      (update stk last-idx open-card))
+    stk))
 
 (defn gen-stack
   "カードを一つの山に積む"
@@ -116,12 +117,14 @@
 (defn sorted-card?
   "連番のカードか？"
   [cs]
-  (loop [c1 (first cs), c2 (second cs), r (drop 2 cs)]
-    (if (nil? c2)
-      true
-      (if (= 1 (- (:rank c1) (:rank c2)) )
-        (recur c2 (first r) (rest r))
-        false))))
+  (if (empty? cs)
+    false
+    (loop [c1 (first cs), c2 (second cs), r (drop 2 cs)]
+      (if (nil? c2)
+        true
+        (if (= 1 (- (:rank c1) (:rank c2)) )
+          (recur c2 (first r) (rest r))
+          false)))))
 
 (defn movable?
   "山からn枚を移動することは合法か？"
@@ -171,7 +174,9 @@
   [stk]
   (if (< (count stk) 13)
     false
-    (sorted-card? (peek-n 13 stk))))
+    (let [cards (peek-n 13 stk)]
+      (and (= 13 (:rank (first cards)))
+           (sorted-card? cards)))))
 
 (defn remove-sorted-card
   "揃ったカードをデッキから除外する"
