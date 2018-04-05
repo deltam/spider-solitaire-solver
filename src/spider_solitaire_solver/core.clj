@@ -1,42 +1,17 @@
 (ns spider-solitaire-solver.core
   "スパイダーソリティアのゲーム操作")
 
-;; トランプ二組
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; gen
+
 (def cards
+  "トランプ二組"
   (for [r (flatten (repeat 8 (range 1 14))), s [:c]]
     r))
 
-;; 初期配置の山のカード数
-(def stack-count [6 6 6 6 5 5 5 5 5 5])
-
-;; ゲーム履歴
-(def deck-history (ref []))
-
-(defn current-deck
-  "最新のゲームの状態"
-  []
-  (peek @deck-history))
-
-(defn init-history
-  "ゲーム履歴を初期化する"
-  []
-  (dosync (ref-set deck-history [])))
-
-(defn push-history
-  "ゲーム履歴を追加"
-  [d]
-  (dosync
-   (ref-set deck-history (conj @deck-history d))))
-
-(defn pop-history
-  "ゲーム履歴をひとつ戻す"
-  []
-  (dosync
-   (ref-set deck-history (pop @deck-history))))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; init
+(def stack-count
+  "初期配置の山のカード数"
+  [6 6 6 6 5 5 5 5 5 5])
 
 (defn partition-by-counts
   "指定された個数ごとにアイテムを切り分ける"
@@ -90,11 +65,7 @@
     {:stacks (mapv #(gen-stack %) stacks)
      :draw draw}))
 
-(defn init
-  "ゲームの初期状態"
-  []
-  (init-history)
-  (push-history (gen-deck)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; move
@@ -127,7 +98,7 @@
           false)))))
 
 (defn movable?
-  "山からn枚を移動することは合法か？"
+  "山からn枚を移動することは可能か？"
   [deck from to n]
   (let [fs (nth (:stacks deck) from)
         ts (nth (:stacks deck) to)]
@@ -188,6 +159,44 @@
                   %)
                (:stacks deck))))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; game status
+
+(def deck-history "ゲーム履歴" (ref []))
+
+(defn current-deck
+  "最新のゲームの状態"
+  []
+  (peek @deck-history))
+
+(defn init-history
+  "ゲーム履歴を初期化する"
+  []
+  (dosync (ref-set deck-history [])))
+
+(defn push-history
+  "ゲーム履歴を追加"
+  [d]
+  (dosync
+   (ref-set deck-history (conj @deck-history d))))
+
+(defn pop-history
+  "ゲーム履歴をひとつ戻す"
+  []
+  (dosync
+   (ref-set deck-history (pop @deck-history))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ui
+
+(defn init
+  "ゲームの初期状態"
+  []
+  (init-history)
+  (push-history (gen-deck)))
+
 (defn move
   "札の移動"
   [draw? from to n]
@@ -206,10 +215,9 @@
   (pop-history))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; display
-
-(defn vec->str [v]
+(defn vec->str
+  "vectorを文字列化する"
+  [v]
   (reduce str
           (interpose " " v)))
 
