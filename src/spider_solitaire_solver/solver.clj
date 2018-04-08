@@ -16,14 +16,13 @@
                :let [limit (count-movable-card (nth (:stacks deck) from))]
                :when (not= from to)]
            (map #(vector false from to %)
-                (filter (fn [n] (ss/movable? deck from to n))
-                        (range 1 (inc limit))))
-           )))
+                (range 1 (inc limit))))))
 
 (defn valid-move
   "可能な手のリストを返す"
   [deck]
-  (let [moves (all-move deck)]
+  (let [moves (filter (fn [[_ from to n]] (ss/movable? deck from to n))
+                      (all-move deck))]
     (if (ss/drawable? deck)
       (conj moves [true 0 0 0])
       moves)))
